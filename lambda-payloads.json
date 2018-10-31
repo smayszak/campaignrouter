@@ -1,0 +1,25 @@
+{
+    "MapRoute": {
+        "apigateway": {
+            "path": "/",
+            "method": {
+                "value": "POST",
+                "items": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "DELETE",
+                    "HEAD",
+                    "OPTIONS",
+                    "PATCH"
+                ]
+            },
+            "body": {
+                "customerId": "1"
+            }
+        },
+        "lambda": {
+            "customerId": "207640175a"
+        }
+    }
+}

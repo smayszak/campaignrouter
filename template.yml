@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+- AWS::Serverless-2016-10-31
+- AWS::CodeStar
+
+Parameters:
+  ProjectId:
+    Type: String
+    Description: AWS CodeStar projectID used to associate new resources to team members
+
+# Enable deployment monitoring
+Globals:
+  Function:
+    AutoPublishAlias: live
+    DeploymentPreference:
+      Enabled: true
+      Type: Canary10Percent5Minutes
+      Alarms:
+      - !Ref AliasErrorMetricGreaterThanZeroAlarm
+
+Resources:
+  MapRoute:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      #enable tracing for XRAY traces
+      Tracing: Active 
+      Runtime: nodejs4.3
+      Environment:
+        Variables:
+          NODE_ENV: production
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        AnyEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+  #this is the alarm we will monitor when deploying
+  AliasErrorMetricGreaterThanZeroAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: Lambda Function Error > 0
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: Resource
+          Value: !Sub "${MapRoute}:live"
+        - Name: FunctionName
+          Value: !Ref MapRoute
+      EvaluationPeriods: 1
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Period: 60
+      Statistic: Sum
+      Threshold: 0

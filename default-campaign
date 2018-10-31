@@ -1,0 +1,24 @@
+//this is the file that we put into the s3 bucket if we want to add 
+//campaigns. keeping a copy here in source.
+{
+    "CampaignTitle":"Test Graph Layouts",
+    "CampaignID":"CMP01",
+    "SchemaVersion":"1.0",
+    "Treatments":[
+        {
+            "id": "01",
+            "description":"List based graph",
+            "path": "https://s3-us-west-2.amazonaws.com/mayszak-campaign/mock1.png"
+        },
+        {
+            "id": "02",
+            "description":"Big Graph lines",
+            "path": "https://s3-us-west-2.amazonaws.com/mayszak-campaign/mock1.png"
+        },
+        {
+            "id": "03",
+            "description":"Busy dash!",
+            "path": "https://s3-us-west-2.amazonaws.com/mayszak-campaign/mock3.png"
+        }
+    ]
+}
