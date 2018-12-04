@@ -8,15 +8,15 @@ Parameters:
     Type: String
     Description: AWS CodeStar projectID used to associate new resources to team members
 
-# Enable deployment monitoring
+# Enable deployment monitoring Canary10Percent5Minutes AliasErrorMetricGreaterThanZeroAlarm
 Globals:
   Function:
     AutoPublishAlias: live
     DeploymentPreference:
       Enabled: true
-      Type: Canary10Percent5Minutes
+      Type: AllAtOnce
       Alarms:
-      - !Ref AliasErrorMetricGreaterThanZeroAlarm
+      - !Ref NoInvokes
 
 Resources:
   MapRoute:
@@ -48,20 +48,20 @@ Resources:
           Properties:
             Path: /
             Method: get
-  #this is the alarm we will monitor when deploying
-  AliasErrorMetricGreaterThanZeroAlarm:
+  # #this is the alarm we will monitor when deploying
+  NoInvokes:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmDescription: Lambda Function Error > 0
-      ComparisonOperator: GreaterThanThreshold
+      AlarmDescription: Lambda Invokes < 1
+      ComparisonOperator: LessThanThreshold
       Dimensions:
         - Name: Resource
           Value: !Sub "${MapRoute}:live"
         - Name: FunctionName
           Value: !Ref MapRoute
       EvaluationPeriods: 1
-      MetricName: Errors
+      MetricName: Invocations
       Namespace: AWS/Lambda
       Period: 60
       Statistic: Sum
-      Threshold: 0
+      Threshold: 1
